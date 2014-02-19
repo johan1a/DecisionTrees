@@ -1,18 +1,71 @@
+import java.util.ArrayList;
+
 public class TreeLearner {
-	public DecisionTree learn() {
-//		function DECISION-TREE-LEARNING(examples, attributes, parent examples) returns
-//		a tree
-//		if examples is empty then return PLURALITY-VALUE(parent examples)
-//		else if all examples have the same classification then return the classification
-//		else if attributes is empty then return PLURALITY-VALUE(examples)
-//		else
-//		A<-argmaxa tillhoer attributes IMPORTANCE(a, examples)
-//		tree<-a new decision tree with root test A
-//		for each value vk of A do
-//		exs <-{e : e tillhoerexamples and e.A = vk}
-//		subtree<-DECISION-TREE-LEARNING(exs, attributes -A, examples)
-//		add a branch to tree with label (A = vk) and subtree subtree
-//		return tree
-		return null;
+	public static DecisionTree learn(ArrayList<Example> examples,
+			ArrayList<Attribute> attributes, ArrayList<Example> parentExamples) {
+
+		if (examples.size() == 0) {
+			return pluralityValue(parentExamples);
+		}
+		Attribute a = attributes.get(0);
+		String oldClassification = examples.get(0).getClassification(a);
+		String classification;
+		boolean allSame = true;
+		for (int i = 1; i < examples.size(); i++) {
+			classification = examples.get(i).getClassification(a);
+			if (classification != oldClassification) {
+				allSame = false;
+				break;
+			}
+		}
+		if (allSame) {
+			return new DecisionTree(examples.get(0).getOutput()); // wrooong
+		}
+
+		if (attributes.isEmpty()) {
+
+			return pluralityValue(examples);
+		}
+
+		Attribute attribute = importance(attributes, examples);
+		DecisionTree tree = new DecisionTree(attribute);
+		for (String v : attribute.getOptions()) {
+			ArrayList<Example> exs = new ArrayList<Example>();
+			for (Example e : examples) {
+				if (e.getClassification(attribute).equals(v)) {
+					exs.add(e);
+				}
+			}
+			
+			
+			ArrayList<Attribute> attributes2 = new ArrayList<Attribute>();
+			attributes2.addAll(attributes);
+			attributes2.remove(attribute);
+			DecisionTree subTree = learn(exs, attributes2, examples);
+			tree.addBranch(v, subTree);
+		}
+		return tree;
+	}
+
+	private static DecisionTree pluralityValue(ArrayList<Example> examples) {
+		final String output1 = "Yes", output2 = "No"; // TODO hårdkodat
+		int sum1 = 0, sum2 = 0;
+		for (Example e : examples) {
+			if (e.getOutput().equals(output1)) {
+				sum1++;
+			} else {
+				sum2++;
+			}
+		}
+
+		if (sum1 > sum2) { // TODO ranomly pls
+			return new DecisionTree(output1);
+		}
+		return new DecisionTree(output2);
+	}
+
+	private static Attribute importance(ArrayList<Attribute> attributes,
+			ArrayList<Example> examples) {
+		return attributes.get(0);
 	}
 }
