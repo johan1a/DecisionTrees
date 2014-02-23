@@ -83,13 +83,13 @@ public class TreeLearner {
 	}
 
 	private Attribute importance(final ArrayList<Attribute> attributes) {
-		double max = 0, entropy = 0;
+		double max = 0, gain = 0;
 		Attribute result = null;
 
 		for (Attribute attribute : attributes) {
-			entropy = entropyMath.calculateGain(attribute);
-			if (entropy > max) {
-				max = entropy;
+			gain = entropyMath.calculateGain(attribute);
+			if (gain > max) {
+				max = gain;
 				result = attribute;
 			}
 		}
