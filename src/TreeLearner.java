@@ -34,7 +34,7 @@ public class TreeLearner {
 			}
 		}
 		if (allSame) {
-			return new DecisionTree(examples.get(0).getOutput()); // wrooong
+			return new DecisionTree(examples.get(0).getOutput());
 		}
 
 		if (attributes.isEmpty()) {
@@ -84,7 +84,7 @@ public class TreeLearner {
 
 	private Attribute importance(final ArrayList<Attribute> attributes) {
 		double max = 0, entropy = 0;
-		Attribute result = attributes.get(0);
+		Attribute result = null;
 
 		for (Attribute attribute : attributes) {
 			entropy = entropyMath.calculateGain(attribute);
