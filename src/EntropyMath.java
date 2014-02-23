@@ -26,6 +26,37 @@ public class EntropyMath {
 	private double totalEntropy() {
 		return b(totalPos / (totalPos + totalNeg));
 	}
+	
+	public boolean relevant(Attribute attribute){
+		double delta = delta(attribute);
+		//todo
+		return false;
+	}
+	
+	public double delta(Attribute attribute){
+		
+		double delta = 0;
+		for (String option : attribute.getOptions()) {
+			double p = 0, n = 0;
+			for (Example e : allExamples) {
+				if (e.getClassification(attribute).equals(option)) {
+					if (e.getOutput().equals(posOutput)) {
+						p++;
+					} else {
+						n++;
+					}
+				}
+			}
+			
+			double pkhat = totalPos * (p + n) / (totalPos + totalNeg);
+			double nkhat = totalNeg * (p + n) / (totalPos + totalNeg);
+			
+			delta += Math.pow((p-pkhat),2)/pkhat + Math.pow((n-nkhat),2)/nkhat;		
+		}
+
+		System.out.println(delta);
+		return delta;
+	}
 
 	private double remainder(Attribute attribute) {
 		double sum = 0;

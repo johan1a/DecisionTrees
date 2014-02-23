@@ -59,6 +59,10 @@ public class TreeLearner {
 		}
 		return tree;
 	}
+	
+	public void prune(DecisionTree tree){
+		tree.prune(tree.root, entropyMath);
+	}
 
 	private DecisionTree pluralityValue(final ArrayList<Example> examples) {
 		int sum1 = 0, sum2 = 0;

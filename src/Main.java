@@ -9,5 +9,7 @@ public class Main {
 		DecisionTree tree = learner.learn();
 
 		tree.print();
+		learner.prune(tree);
+		
 	}
 }

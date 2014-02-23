@@ -18,6 +18,19 @@ public class DecisionTree {
 	public Node getRoot() {
 		return root;
 	}
+	
+	public void prune(Node node, EntropyMath entropyMath){
+
+			for(Node n: node.children.values()){
+				if(n.isOutputNode()){
+					if(entropyMath.relevant(node.attribute)){
+						n = null;
+					}			
+			}else{				
+				prune(n, entropyMath);
+			}
+		}
+	}
 
 	class Node {
 		Attribute attribute;
