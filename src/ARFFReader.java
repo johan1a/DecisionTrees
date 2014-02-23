@@ -14,19 +14,12 @@ public class ARFFReader {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(
 					"restaurants.ARFF"));
-			String line;
 
 			br.readLine(); // Skip the top arff stuff
 			br.readLine();
 
 			readAttributes(attributes, br);
-
-			// while (br.ready()) {
-			// if (br.readLine().startsWith("@data")) {
 			readExamples(examples, attributes, br);
-			// break;
-			// }
-			// }
 
 			br.close();
 		} catch (FileNotFoundException e) {
@@ -50,17 +43,15 @@ public class ARFFReader {
 		try {
 			while (br.ready()) {
 				line = br.readLine();
-
 				String[] values = line.split(",");
 				ArrayList<String> a = new ArrayList<String>();
-
+				
 				for (String s : values) {
 					a.add(s);
 				}
 				examples.add(new Example(attributes, a));
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

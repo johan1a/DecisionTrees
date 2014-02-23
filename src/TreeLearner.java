@@ -1,11 +1,26 @@
 import java.util.ArrayList;
 
 public class TreeLearner {
-	public static DecisionTree learn(ArrayList<Example> examples,
-			ArrayList<Attribute> attributes, ArrayList<Example> parentExamples) {
+	private EntropyMath entropyMath;
+	private final ArrayList<Example> allExamples;
+	private final ArrayList<Attribute> attributes;
+	final String posOutput = "Yes", negOutput = "No";
 
+	public TreeLearner(ArrayList<Example> allExamples,
+			ArrayList<Attribute> attributes) {
+		this.allExamples = allExamples;
+		this.attributes = attributes;
+		this.entropyMath = new EntropyMath(allExamples);
+	}
+
+	public DecisionTree learn() {
+		return learn(allExamples, attributes);
+	}
+
+	private DecisionTree learn(ArrayList<Example> examples,
+			ArrayList<Attribute> attributes) {
 		if (examples.size() == 0) {
-			return pluralityValue(parentExamples);
+			return pluralityValue(allExamples);
 		}
 		Attribute a = attributes.get(0);
 		String oldClassification = examples.get(0).getClassification(a);
@@ -23,11 +38,10 @@ public class TreeLearner {
 		}
 
 		if (attributes.isEmpty()) {
-
 			return pluralityValue(examples);
 		}
 
-		Attribute attribute = importance(attributes, examples);
+		Attribute attribute = importance(attributes);
 		DecisionTree tree = new DecisionTree(attribute);
 		for (String v : attribute.getOptions()) {
 			ArrayList<Example> exs = new ArrayList<Example>();
@@ -36,36 +50,49 @@ public class TreeLearner {
 					exs.add(e);
 				}
 			}
-			
-			
+
 			ArrayList<Attribute> attributes2 = new ArrayList<Attribute>();
 			attributes2.addAll(attributes);
 			attributes2.remove(attribute);
-			DecisionTree subTree = learn(exs, attributes2, examples);
+			DecisionTree subTree = learn(exs, attributes2);
 			tree.addBranch(v, subTree);
 		}
 		return tree;
 	}
 
-	private static DecisionTree pluralityValue(ArrayList<Example> examples) {
-		final String output1 = "Yes", output2 = "No"; // TODO hårdkodat
+	private DecisionTree pluralityValue(final ArrayList<Example> examples) {
 		int sum1 = 0, sum2 = 0;
 		for (Example e : examples) {
-			if (e.getOutput().equals(output1)) {
+			if (e.getOutput().equals(posOutput)) {
 				sum1++;
 			} else {
 				sum2++;
 			}
 		}
 
-		if (sum1 > sum2) { // TODO ranomly pls
-			return new DecisionTree(output1);
+		if (sum1 > sum2) {
+			return new DecisionTree(posOutput);
+		} else if (sum2 > sum1) {
+			return new DecisionTree(negOutput);
+		} else {
+			if (Math.random() < 0.5) {
+				return new DecisionTree(posOutput);
+			}
+			return new DecisionTree(negOutput);
 		}
-		return new DecisionTree(output2);
 	}
 
-	private static Attribute importance(ArrayList<Attribute> attributes,
-			ArrayList<Example> examples) {
-		return attributes.get(0);
+	private Attribute importance(final ArrayList<Attribute> attributes) {
+		double max = 0, entropy = 0;
+		Attribute result = attributes.get(0);
+
+		for (Attribute attribute : attributes) {
+			entropy = entropyMath.calculateGain(attribute);
+			if (entropy > max) {
+				max = entropy;
+				result = attribute;
+			}
+		}
+		return result;
 	}
 }

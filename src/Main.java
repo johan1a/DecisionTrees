@@ -4,8 +4,9 @@ public class Main {
 		ARFFReader reader = new ARFFReader();
 		reader.read();
 
-		DecisionTree tree = TreeLearner.learn(reader.getExamples(),
-				reader.getAttributes(), reader.getExamples());
+		TreeLearner learner = new TreeLearner(reader.getExamples(),
+				reader.getAttributes());
+		DecisionTree tree = learner.learn();
 
 		tree.print();
 	}
