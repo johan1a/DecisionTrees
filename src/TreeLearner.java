@@ -5,9 +5,10 @@ public class TreeLearner {
 	private EntropyMath entropyMath;
 	private final ArrayList<Example> allExamples;
 	private final ArrayList<Attribute> attributes;
-	final String posOutput = "Yes", negOutput = "No";
-	private int subTreePos = 0, subTreeNeg = 0;
-	private boolean couldPrune = false;
+	final String posOutput = "yes", negOutput = "no";
+	private int nbrPos = 0, nbrNeg = 0;
+	private boolean couldPrune = false; // True if the last prune attempt was
+										// succesful
 
 	public TreeLearner(ArrayList<Example> allExamples,
 			ArrayList<Attribute> attributes) {
@@ -16,21 +17,22 @@ public class TreeLearner {
 		this.entropyMath = new EntropyMath(allExamples);
 	}
 
+	/* Creates a decision tree using the ID3 algorithm */
 	public DecisionTree learn() {
-		return learn(allExamples, attributes);
+		return id3(allExamples, attributes);
 	}
 
-	private DecisionTree learn(ArrayList<Example> examples,
+	private DecisionTree id3(ArrayList<Example> examples,
 			ArrayList<Attribute> attributes) {
 		if (examples.size() == 0) {
 			return new DecisionTree(getPluralityValue(allExamples));
 		}
-		Attribute a = attributes.get(0);
-		String oldClassification = examples.get(0).getClassification(a);
+		//Attribute a = attributes.get(0);
+		String oldClassification = examples.get(0).getOutput();
 		String classification;
 		boolean allSame = true;
 		for (int i = 1; i < examples.size(); i++) {
-			classification = examples.get(i).getClassification(a);
+			classification = examples.get(i).getOutput();
 			if (classification != oldClassification) {
 				allSame = false;
 				break;
@@ -57,15 +59,16 @@ public class TreeLearner {
 			ArrayList<Attribute> attributes2 = new ArrayList<Attribute>();
 			attributes2.addAll(attributes);
 			attributes2.remove(attribute);
-			DecisionTree subTree = learn(exs, attributes2);
+			DecisionTree subTree = id3(exs, attributes2);
 			tree.addBranch(v, subTree);
 		}
 		return tree;
 	}
 
+	/* Returns the attribute with highest gain */
 	private Attribute importance(final ArrayList<Attribute> attributes) {
-		double max = 0, gain = 0;
-		Attribute result = null;
+		double max = Double.MIN_VALUE, gain = 0;
+		Attribute result = attributes.get(0);
 
 		for (Attribute attribute : attributes) {
 			gain = entropyMath.calculateGain(attribute);
@@ -77,10 +80,11 @@ public class TreeLearner {
 		return result;
 	}
 
+	/* Chi squared pruning */
 	public void prune(DecisionTree tree) {
 		couldPrune = false;
 		calculateTreeNbrPosNeg(tree.getRoot());
-		entropyMath.setNandP(subTreePos, subTreeNeg);
+		entropyMath.setTreeTotalPandN(nbrPos, nbrNeg);
 		prune(tree.getRoot());
 	}
 
@@ -98,7 +102,12 @@ public class TreeLearner {
 				for (Node n : children.values()) {
 					prune(n);
 				}
-			} else if (!entropyMath.relevant(node.attribute)) {
+
+				/*
+				 * * A node with only leaves for children. Check if it can be
+				 * pruned.
+				 */
+			} else if (!entropyMath.relevant(node)) {
 				node.setOutput(getPluralityValue(node));
 				node.setChildren(null);
 				couldPrune = true;
@@ -106,6 +115,7 @@ public class TreeLearner {
 		}
 	}
 
+	/* Returns the most common output among the examples. */
 	private String getPluralityValue(final ArrayList<Example> examples) {
 		int sum1 = 0, sum2 = 0;
 		for (Example e : examples) {
@@ -125,13 +135,18 @@ public class TreeLearner {
 		}
 	}
 
+	/*
+	 * Calculates and returns the most common output in the tree starting with
+	 * the Node node, and puts the number of positive outputs in nbrPos and the
+	 * number of negative output in nbrNeg.
+	 */
 	private String getPluralityValue(Node node) {
-		subTreePos = 0;
-		subTreeNeg = 0;
+		nbrPos = 0;
+		nbrNeg = 0;
 		calculateTreeNbrPosNeg(node);
-		if (subTreePos > subTreeNeg) {
+		if (nbrPos > nbrNeg) {
 			return posOutput;
-		} else if (subTreeNeg > subTreePos) {
+		} else if (nbrNeg > nbrPos) {
 			return negOutput;
 		}
 		return (Math.random() < 0.5) ? posOutput : negOutput;
@@ -145,9 +160,9 @@ public class TreeLearner {
 			}
 		} else {
 			if (node.output.equals(posOutput)) {
-				subTreePos++;
+				nbrPos++;
 			} else if (node.output.equals(negOutput)) {
-				subTreeNeg++;
+				nbrNeg++;
 			} else {
 				System.exit(1);
 			}

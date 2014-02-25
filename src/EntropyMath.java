@@ -4,8 +4,10 @@ import org.apache.commons.math3.distribution.ChiSquaredDistribution;
 
 public class EntropyMath {
 	ArrayList<Example> allExamples;
-	private final String posOutput = "Yes";
-	int totalPos, totalNeg;
+	private final String posOutput = "yes";
+	int subTreePos = 0, subTreeNeg = 0;
+	int totalPos = 0, totalNeg = 0;
+	private final double CONFIDENCE = 0.95;
 
 	public EntropyMath(ArrayList<Example> allExamples) {
 		this.allExamples = allExamples;
@@ -20,75 +22,67 @@ public class EntropyMath {
 		}
 	}
 
-	public void calculateTotalPosNeg(DecisionTree tree) {
-		totalPos = 0;
-		totalNeg = 0;
-
-		calculateTotalPosNeg(tree.getRoot());
-
-	}
-
-	private void calculateTotalPosNeg(Node root) {
-		if (root.children != null) {
-			for (Node n : root.children.values()) {
+	/*
+	 * Calculates the number of positive and negative leaves in the tree and
+	 * puts them in subTreePos and subTreeNeg
+	 */
+	private void calculateTotalPosNeg(Node node) {
+		if (node.children != null) {
+			for (Node n : node.children.values()) {
 				calculateTotalPosNeg(n);
 			}
 		} else {
-			if (root.output.equals(posOutput)) {
-				totalPos++;
+			if (node.output.equals(posOutput)) {
+				subTreePos++;
 			} else {
-				totalNeg++;
+				subTreeNeg++;
 			}
 		}
 	}
 
+	/* Calculates the gain of the Attribute */
 	public double calculateGain(Attribute attribute) {
 		return totalEntropy() - remainder(attribute);
 	}
 
-	/* The total entropy */
+	/* Returns the total entropy */
 	private double totalEntropy() {
 		return b(totalPos / ((double) totalPos + totalNeg));
 	}
 
-	public boolean relevant(Attribute attribute) {
-		double delta = delta(attribute);
+	/* Checks if delta >= confidence */
+	public boolean relevant(Node node) {
+		double delta = delta(node);
+		Attribute attribute = node.attribute;
 		int degreesOfFreedom = attribute.getOptions().size() - 1;
 		ChiSquaredDistribution db = new ChiSquaredDistribution(degreesOfFreedom);
-		double confidence = 0.95;
+
 		System.out.println(attribute.toString());
 		System.out.println("Delta: " + delta);
 		System.out.println("Probability: " + db.cumulativeProbability(delta));
-		System.out.println("Confidence: " + confidence);
+		System.out.println("Confidence: " + CONFIDENCE);
 		System.out.println("p >= q: "
-				+ (db.cumulativeProbability(delta) >= confidence));
+				+ (db.cumulativeProbability(delta) <= CONFIDENCE));
 		System.out.println();
 
-		return db.cumulativeProbability(delta) >= confidence;
+		return db.cumulativeProbability(delta) >= CONFIDENCE;
 	}
 
-	public double delta(Attribute attribute) {
-
+	private double delta(Node node) {
 		double delta = 0;
-		for (String option : attribute.getOptions()) {
-			double p = 0, n = 0;
+		int p = totalPos, n = totalNeg;
 
-			for (Example e : allExamples) {
-				if (e.getClassification(attribute).equals(option)) {
-					if (e.getOutput().equals(posOutput)) {
-						p++;
-					} else {
-						n++;
-					}
-				}
-			}
+		subTreePos = 0;
+		subTreeNeg = 0;
+		calculateTotalPosNeg(node);
+		double pk = subTreePos, nk = subTreeNeg;
 
-			double pkhat = totalPos * (p + n) / (totalPos + totalNeg);
-			double nkhat = totalNeg * (p + n) / (totalPos + totalNeg);
+		double pkhat = p * (pk + nk) / (p + n);
+		double nkhat = n * (pk + nk) / (p + n);
 
-			delta += Math.pow((p - pkhat), 2) / pkhat
-					+ Math.pow((n - nkhat), 2) / nkhat;
-		}
+		delta += Math.pow((pk - pkhat), 2) / pkhat + Math.pow((nk - nkhat), 2)
+				/ nkhat;
+
 		return delta;
 	}
 
@@ -135,7 +129,7 @@ public class EntropyMath {
 		return Math.log(x) / Math.log(2);
 	}
 
-	public void setNandP(int subTreePos, int subTreeNeg) {
+	public void setTreeTotalPandN(int subTreePos, int subTreeNeg) {
 		totalPos = subTreePos;
 		totalNeg = subTreeNeg;
 	}

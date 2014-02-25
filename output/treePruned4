@@ -1,0 +1,8 @@
+Hungry = True
+ Price = $$$: yes
+ Price = $$: yes
+ Price = $: no
+Hungry = False
+ Price = $$$: no
+ Price = $$: no
+ Price = $: no

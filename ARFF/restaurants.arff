@@ -1,0 +1,27 @@
+@relation,restaurants.symbolic
+
+@attribute Alternate {True, False}
+@attribute Bar {True, False}
+@attribute Fri/Sat {True, False}
+@attribute Hungry {True, False}
+@attribute Patrons {None, Some, Full}
+@attribute Price {$, $$, $$$}
+@attribute Raining {True, False}
+@attribute Reservation {True, False}
+@attribute Type {French, Thai, Burger, Italian}
+@attribute WaitEstimate {0-10, 10-30, 30-60}
+@attribute WillWait {yes,no}
+
+@data
+True,False,False,True,Some,$$$,False,True,French,0–10,yes
+True,False,False,True,Full,$,False,False,Thai,30–60,no
+False,True,False,False,Some,$,False,False,Burger,0–10,yes
+True,False,True,True,Full,$,True,False,Thai,10–30,yes
+True,False,True,False,Full,$$$,False,True,French,>60,no
+False,True,False,True,Some,$$,True,True,Italian,0–10,yes
+False,True,False,False,False,$,True,False,Burger,0–10,no
+False,False,False,True,Some,$$,True,True,Thai,0–10,yes
+False,True,True,False,Full,$,True,False,Burger,>60,no
+True,True,True,True,Full,$$$,False,True,Italian,10–30,no
+False,False,False,False,Bone,$,False,False,Thai,0–10,no
+True,True,True,True,Full,$,False,False,Burger,30–60,yes

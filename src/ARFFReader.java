@@ -7,16 +7,23 @@ import java.util.ArrayList;
 public class ARFFReader {
 	ArrayList<Attribute> attributes;
 	ArrayList<Example> examples;
+	private final String arffPath = "ARFF/";
 
 	public void read() {
 		attributes = new ArrayList<Attribute>();
 		examples = new ArrayList<Example>();
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(
-					"restaurants.ARFF"));
 
-			br.readLine(); // Skip the top arff stuff
-			br.readLine();
+		String fileName;
+		fileName = "restaurants.ARFF";
+		//fileName = "weather.nominal.arff";
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(arffPath
+					+ fileName));
+
+			String line = br.readLine();
+			while (!line.startsWith("@relation") || line.startsWith("%")) {
+				line = br.readLine();
+			}
 
 			readAttributes(attributes, br);
 			readExamples(examples, attributes, br);
@@ -43,13 +50,15 @@ public class ARFFReader {
 		try {
 			while (br.ready()) {
 				line = br.readLine();
-				String[] values = line.split(",");
-				ArrayList<String> a = new ArrayList<String>();
-				
-				for (String s : values) {
-					a.add(s);
+				if (!line.startsWith("%")) {
+					String[] values = line.split(",");
+					ArrayList<String> a = new ArrayList<String>();
+
+					for (String s : values) {
+						a.add(s);
+					}
+					examples.add(new Example(attributes, a));
 				}
-				examples.add(new Example(attributes, a));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -61,6 +70,9 @@ public class ARFFReader {
 		String line;
 		while (br.ready()) {
 			line = br.readLine();
+			if (line.startsWith("%")) {
+				continue;
+			}
 			if (line.startsWith("@data")) {
 				break;
 			}
