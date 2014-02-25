@@ -63,25 +63,6 @@ public class TreeLearner {
 		return tree;
 	}
 
-	private String getPluralityValue(final ArrayList<Example> examples) {
-		int sum1 = 0, sum2 = 0;
-		for (Example e : examples) {
-			if (e.getOutput().equals(posOutput)) {
-				sum1++;
-			} else {
-				sum2++;
-			}
-		}
-
-		if (sum1 > sum2) {
-			return posOutput;
-		} else if (sum2 > sum1) {
-			return negOutput;
-		} else {
-			return (Math.random() < 0.5) ? posOutput : negOutput;
-		}
-	}
-
 	private Attribute importance(final ArrayList<Attribute> attributes) {
 		double max = 0, gain = 0;
 		Attribute result = null;
@@ -98,6 +79,8 @@ public class TreeLearner {
 
 	public void prune(DecisionTree tree) {
 		couldPrune = false;
+		calculateTreeNbrPosNeg(tree.getRoot());
+		entropyMath.setNandP(subTreePos, subTreeNeg);
 		prune(tree.getRoot());
 	}
 
@@ -123,10 +106,29 @@ public class TreeLearner {
 		}
 	}
 
+	private String getPluralityValue(final ArrayList<Example> examples) {
+		int sum1 = 0, sum2 = 0;
+		for (Example e : examples) {
+			if (e.getOutput().equals(posOutput)) {
+				sum1++;
+			} else {
+				sum2++;
+			}
+		}
+
+		if (sum1 > sum2) {
+			return posOutput;
+		} else if (sum2 > sum1) {
+			return negOutput;
+		} else {
+			return (Math.random() < 0.5) ? posOutput : negOutput;
+		}
+	}
+
 	private String getPluralityValue(Node node) {
 		subTreePos = 0;
 		subTreeNeg = 0;
-		calculatePluralityValue(node);
+		calculateTreeNbrPosNeg(node);
 		if (subTreePos > subTreeNeg) {
 			return posOutput;
 		} else if (subTreeNeg > subTreePos) {
@@ -135,11 +137,11 @@ public class TreeLearner {
 		return (Math.random() < 0.5) ? posOutput : negOutput;
 	}
 
-	private void calculatePluralityValue(Node node) {
+	private void calculateTreeNbrPosNeg(Node node) {
 		HashMap<String, Node> children = node.children;
 		if (children != null) {
 			for (Node n : children.values()) {
-				calculatePluralityValue(n);
+				calculateTreeNbrPosNeg(n);
 			}
 		} else {
 			if (node.output.equals(posOutput)) {

@@ -9,11 +9,12 @@ public class Main {
 		Util.saveToFile("tree", tree.toString());
 		learner.prune(tree);
 		int k = 1;
-		
+
 		while (learner.couldPrune()) {
 			Util.saveToFile("treePruned" + k, tree.toString());
 			learner.prune(tree);
 			k++;
 		}
+		System.out.println("Pruned " + (k - 1) + " times");
 	}
 }

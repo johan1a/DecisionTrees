@@ -20,6 +20,28 @@ public class EntropyMath {
 		}
 	}
 
+	public void calculateTotalPosNeg(DecisionTree tree) {
+		totalPos = 0;
+		totalNeg = 0;
+
+		calculateTotalPosNeg(tree.getRoot());
+
+	}
+
+	private void calculateTotalPosNeg(Node root) {
+		if (root.children != null) {
+			for (Node n : root.children.values()) {
+				calculateTotalPosNeg(n);
+			}
+		} else {
+			if (root.output.equals(posOutput)) {
+				totalPos++;
+			} else {
+				totalNeg++;
+			}
+		}
+	}
+
 	public double calculateGain(Attribute attribute) {
 		return totalEntropy() - remainder(attribute);
 	}
@@ -50,6 +72,7 @@ public class EntropyMath {
 		double delta = 0;
 		for (String option : attribute.getOptions()) {
 			double p = 0, n = 0;
+
 			for (Example e : allExamples) {
 				if (e.getClassification(attribute).equals(option)) {
 					if (e.getOutput().equals(posOutput)) {
@@ -110,5 +133,10 @@ public class EntropyMath {
 
 	private static double log2(double x) {
 		return Math.log(x) / Math.log(2);
+	}
+
+	public void setNandP(int subTreePos, int subTreeNeg) {
+		totalPos = subTreePos;
+		totalNeg = subTreeNeg;
 	}
 }
