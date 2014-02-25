@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class DecisionTree {
 	Node root;
 
@@ -21,7 +18,7 @@ public class DecisionTree {
 	}
 
 	public void print() {
-		root.print("");
+		root.print();
 	}
 
 	@Override

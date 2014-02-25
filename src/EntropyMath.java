@@ -31,12 +31,18 @@ public class EntropyMath {
 
 	public boolean relevant(Attribute attribute) {
 		double delta = delta(attribute);
-		int degreesOfFreedom = totalNeg + totalPos - 1;
+		int degreesOfFreedom = attribute.getOptions().size() - 1;
 		ChiSquaredDistribution db = new ChiSquaredDistribution(degreesOfFreedom);
 		double confidence = 0.95;
-		System.out.println(db.cumulativeProbability(delta));
-		//System.out.println(db.cumulativeProbability(delta) <= 1 - confidence);
-		return db.cumulativeProbability(delta) <= 1 - confidence;
+		System.out.println(attribute.toString());
+		System.out.println("Delta: " + delta);
+		System.out.println("Probability: " + db.cumulativeProbability(delta));
+		System.out.println("Confidence: " + confidence);
+		System.out.println("p >= q: "
+				+ (db.cumulativeProbability(delta) >= confidence));
+		System.out.println();
+
+		return db.cumulativeProbability(delta) >= confidence;
 	}
 
 	public double delta(Attribute attribute) {

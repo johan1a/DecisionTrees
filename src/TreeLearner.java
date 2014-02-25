@@ -21,7 +21,7 @@ public class TreeLearner {
 	private DecisionTree learn(ArrayList<Example> examples,
 			ArrayList<Attribute> attributes) {
 		if (examples.size() == 0) {
-			return pluralityValue(allExamples);
+			return new DecisionTree(getPluralityValue(allExamples));
 		}
 		Attribute a = attributes.get(0);
 		String oldClassification = examples.get(0).getClassification(a);
@@ -39,7 +39,7 @@ public class TreeLearner {
 		}
 
 		if (attributes.isEmpty()) {
-			return pluralityValue(examples);
+			return new DecisionTree(getPluralityValue(examples));
 		}
 
 		Attribute attribute = importance(attributes);
@@ -61,6 +61,42 @@ public class TreeLearner {
 		return tree;
 	}
 
+	private String getPluralityValue(final ArrayList<Example> examples) {
+		int sum1 = 0, sum2 = 0;
+		for (Example e : examples) {
+			if (e.getOutput().equals(posOutput)) {
+				sum1++;
+			} else {
+				sum2++;
+			}
+		}
+
+		if (sum1 > sum2) {
+			return posOutput;
+		} else if (sum2 > sum1) {
+			return negOutput;
+		} else {
+			if (Math.random() < 0.5) {
+				return posOutput;
+			}
+			return negOutput;
+		}
+	}
+
+	private Attribute importance(final ArrayList<Attribute> attributes) {
+		double max = 0, gain = 0;
+		Attribute result = null;
+
+		for (Attribute attribute : attributes) {
+			gain = entropyMath.calculateGain(attribute);
+			if (gain >= max) {
+				max = gain;
+				result = attribute;
+			}
+		}
+		return result;
+	}
+
 	public void prune(DecisionTree tree) {
 		prune(tree.getRoot());
 	}
@@ -80,44 +116,9 @@ public class TreeLearner {
 					prune(children.get(s));
 				}
 			} else if (!entropyMath.relevant(node.attribute)) {
-				node = (pluralityValue(allExamples).getRoot());
+				node.setOutput(getPluralityValue(allExamples));
+				node.setChildren(null);
 			}
 		}
-	}
-
-	public DecisionTree pluralityValue(final ArrayList<Example> examples) {
-		int sum1 = 0, sum2 = 0;
-		for (Example e : examples) {
-			if (e.getOutput().equals(posOutput)) {
-				sum1++;
-			} else {
-				sum2++;
-			}
-		}
-
-		if (sum1 > sum2) {
-			return new DecisionTree(posOutput);
-		} else if (sum2 > sum1) {
-			return new DecisionTree(negOutput);
-		} else {
-			if (Math.random() < 0.5) {
-				return new DecisionTree(posOutput);
-			}
-			return new DecisionTree(negOutput);
-		}
-	}
-
-	private Attribute importance(final ArrayList<Attribute> attributes) {
-		double max = 0, gain = 0;
-		Attribute result = null;
-
-		for (Attribute attribute : attributes) {
-			gain = entropyMath.calculateGain(attribute);
-			if (gain >= max) {
-				max = gain;
-				result = attribute;
-			}
-		}
-		return result;
 	}
 }

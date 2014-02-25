@@ -16,29 +16,26 @@ public class Node {
 
 	public void addChild(String v, DecisionTree subTree) {
 		children.put(v, subTree.getRoot());
-
 	}
 
-	public void print(String indent) {
-		if (children != null) {
-			for (String option : children.keySet()) {
-				System.out.print(indent + attribute + " = " + option);
-				Node child = children.get(option);
-
-				if (child.isOutputNode()) {
-					child.print("");
-				} else {
-					System.out.println();
-					child.print(indent + " ");
-				}
-			}
-		} else {
-			System.out.println(": " + output);
-		}
+	public void print() {
+		System.out.print(toString());
 	}
-	
-	public String toString(){
+
+	public String toString() {
 		return toString("");
+	}
+
+	boolean isOutputNode() {
+		return output != null;
+	}
+
+	public void setOutput(String newOutput) {
+		this.output = newOutput;
+	}
+
+	public void setChildren(HashMap<String, Node> newChildren) {
+		children = newChildren; 
 	}
 
 	public String toString(String indent) {
@@ -58,9 +55,5 @@ public class Node {
 			result = result + ": " + output + "\n";
 		}
 		return result;
-	}
-
-	boolean isOutputNode() {
-		return output != null;
 	}
 }
