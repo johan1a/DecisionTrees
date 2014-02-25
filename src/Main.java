@@ -1,7 +1,7 @@
 public class Main {
 	public static void main(String[] args) {
 		ARFFReader reader = new ARFFReader();
-		reader.read("restaurants.ARFF");
+		reader.read("restaurants.arff");
 		
 		TreeLearner learner = new TreeLearner(reader.getExamples(),
 				reader.getAttributes());

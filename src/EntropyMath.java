@@ -100,7 +100,6 @@ public class EntropyMath {
 	 * the entropy of a Boolean random variable that is true with probability q:
 	 */
 	private static double b(double q) {
-
 		double a, b;
 		if (q == 0) {
 			a = 0;

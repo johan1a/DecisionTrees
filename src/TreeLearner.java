@@ -27,7 +27,7 @@ public class TreeLearner {
 		if (examples.size() == 0) {
 			return new DecisionTree(getPluralityValue(allExamples));
 		}
-		//Attribute a = attributes.get(0);
+
 		String oldClassification = examples.get(0).getOutput();
 		String classification;
 		boolean allSame = true;

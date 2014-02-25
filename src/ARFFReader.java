@@ -13,8 +13,6 @@ public class ARFFReader {
 		attributes = new ArrayList<Attribute>();
 		examples = new ArrayList<Example>();
 
-		
-
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(arffPath
 					+ fileName));
