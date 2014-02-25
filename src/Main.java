@@ -8,8 +8,10 @@ public class Main {
 				reader.getAttributes());
 		DecisionTree tree = learner.learn();
 
-		tree.print();
+		Util.saveToFile("tree", tree.toString());
+
 		learner.prune(tree);
-		
+
+		Util.saveToFile("treePruned", tree.toString());
 	}
 }

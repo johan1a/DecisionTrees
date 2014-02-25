@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TreeLearner {
 	private EntropyMath entropyMath;
@@ -59,12 +60,32 @@ public class TreeLearner {
 		}
 		return tree;
 	}
-	
-	public void prune(DecisionTree tree){
-		tree.prune(tree.root, entropyMath);
+
+	public void prune(DecisionTree tree) {
+		prune(tree.getRoot());
 	}
 
-	private DecisionTree pluralityValue(final ArrayList<Example> examples) {
+	private void prune(Node node) {
+		HashMap<String, Node> children = node.children;
+		if (children != null) {
+			boolean allChildrenAreLeaves = true;
+			for (Node n : children.values()) {
+				if (!n.isOutputNode()) {
+					allChildrenAreLeaves = false;
+					break;
+				}
+			}
+			if (!allChildrenAreLeaves) {
+				for (String s : children.keySet()) {
+					prune(children.get(s));
+				}
+			} else if (!entropyMath.relevant(node.attribute)) {
+				node = (pluralityValue(allExamples).getRoot());
+			}
+		}
+	}
+
+	public DecisionTree pluralityValue(final ArrayList<Example> examples) {
 		int sum1 = 0, sum2 = 0;
 		for (Example e : examples) {
 			if (e.getOutput().equals(posOutput)) {
@@ -92,7 +113,7 @@ public class TreeLearner {
 
 		for (Attribute attribute : attributes) {
 			gain = entropyMath.calculateGain(attribute);
-			if (gain > max) {
+			if (gain >= max) {
 				max = gain;
 				result = attribute;
 			}

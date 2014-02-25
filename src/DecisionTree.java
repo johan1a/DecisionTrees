@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DecisionTree {
@@ -18,65 +19,17 @@ public class DecisionTree {
 	public Node getRoot() {
 		return root;
 	}
-	
-	public void prune(Node node, EntropyMath entropyMath){
-
-			for(Node n: node.children.values()){
-				if(n.isOutputNode()){
-					if(entropyMath.relevant(node.attribute)){
-						n = null;
-					}			
-			}else{				
-				prune(n, entropyMath);
-			}
-		}
-	}
-
-	class Node {
-		Attribute attribute;
-		HashMap<String, Node> children;
-		String output;
-
-		public Node(Attribute attribute) {
-			this.attribute = attribute;
-			children = new HashMap<String, Node>();
-		}
-
-		public Node(String output) {
-			this.output = output;
-		}
-
-		public void addChild(String v, DecisionTree subTree) {
-			children.put(v, subTree.getRoot());
-
-		}
-
-		public void print(String indent) {
-			if (children != null) {
-				for (String option : children.keySet()) {
-					System.out.print(indent + attribute + " = " + option);
-					Node child = children.get(option);
-
-					if (child.isOutputNode()) {
-						child.print("");
-					} else {
-						System.out.println();
-						child.print(indent + " ");
-					}
-				}
-			} else {
-				System.out.println(": " + output);
-			}
-		}
-
-		private boolean isOutputNode() {
-			return output != null;
-		}
-	}
 
 	public void print() {
 		root.print("");
-
 	}
 
+	@Override
+	public String toString() {
+		return root.toString();
+	}
+
+	public void setRoot(Node root) {
+		this.root = root;
+	}
 }

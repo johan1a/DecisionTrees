@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 
+import org.apache.commons.math3.distribution.ChiSquaredDistribution;
+
 public class EntropyMath {
 	ArrayList<Example> allExamples;
 	private final String posOutput = "Yes";
-	double totalPos, totalNeg;
+	int totalPos, totalNeg;
 
 	public EntropyMath(ArrayList<Example> allExamples) {
 		this.allExamples = allExamples;
@@ -24,17 +26,21 @@ public class EntropyMath {
 
 	/* The total entropy */
 	private double totalEntropy() {
-		return b(totalPos / (totalPos + totalNeg));
+		return b(totalPos / ((double) totalPos + totalNeg));
 	}
-	
-	public boolean relevant(Attribute attribute){
+
+	public boolean relevant(Attribute attribute) {
 		double delta = delta(attribute);
-		//todo
-		return false;
+		int degreesOfFreedom = totalNeg + totalPos - 1;
+		ChiSquaredDistribution db = new ChiSquaredDistribution(degreesOfFreedom);
+		double confidence = 0.95;
+		System.out.println(db.cumulativeProbability(delta));
+		//System.out.println(db.cumulativeProbability(delta) <= 1 - confidence);
+		return db.cumulativeProbability(delta) <= 1 - confidence;
 	}
-	
-	public double delta(Attribute attribute){
-		
+
+	public double delta(Attribute attribute) {
+
 		double delta = 0;
 		for (String option : attribute.getOptions()) {
 			double p = 0, n = 0;
@@ -47,14 +53,13 @@ public class EntropyMath {
 					}
 				}
 			}
-			
+
 			double pkhat = totalPos * (p + n) / (totalPos + totalNeg);
 			double nkhat = totalNeg * (p + n) / (totalPos + totalNeg);
-			
-			delta += Math.pow((p-pkhat),2)/pkhat + Math.pow((n-nkhat),2)/nkhat;		
-		}
 
-		System.out.println(delta);
+			delta += Math.pow((p - pkhat), 2) / pkhat
+					+ Math.pow((n - nkhat), 2) / nkhat;
+		}
 		return delta;
 	}
 
