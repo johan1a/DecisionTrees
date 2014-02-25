@@ -57,14 +57,6 @@ public class EntropyMath {
 		int degreesOfFreedom = attribute.getOptions().size() - 1;
 		ChiSquaredDistribution db = new ChiSquaredDistribution(degreesOfFreedom);
 
-		System.out.println(attribute.toString());
-		System.out.println("Delta: " + delta);
-		System.out.println("Probability: " + db.cumulativeProbability(delta));
-		System.out.println("Confidence: " + CONFIDENCE);
-		System.out.println("p >= q: "
-				+ (db.cumulativeProbability(delta) <= CONFIDENCE));
-		System.out.println();
-
 		return db.cumulativeProbability(delta) >= CONFIDENCE;
 	}
 

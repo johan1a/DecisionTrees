@@ -9,13 +9,12 @@ public class ARFFReader {
 	ArrayList<Example> examples;
 	private final String arffPath = "ARFF/";
 
-	public void read() {
+	public void read(String fileName) {
 		attributes = new ArrayList<Attribute>();
 		examples = new ArrayList<Example>();
 
-		String fileName;
-		fileName = "restaurants.ARFF";
-		//fileName = "weather.nominal.arff";
+		
+
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(arffPath
 					+ fileName));
