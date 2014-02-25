@@ -7,6 +7,7 @@ public class TreeLearner {
 	private final ArrayList<Attribute> attributes;
 	final String posOutput = "Yes", negOutput = "No";
 	private int subTreePos = 0, subTreeNeg = 0;
+	private boolean couldPrune = false;
 
 	public TreeLearner(ArrayList<Example> allExamples,
 			ArrayList<Attribute> attributes) {
@@ -96,6 +97,7 @@ public class TreeLearner {
 	}
 
 	public void prune(DecisionTree tree) {
+		couldPrune = false;
 		prune(tree.getRoot());
 	}
 
@@ -116,6 +118,7 @@ public class TreeLearner {
 			} else if (!entropyMath.relevant(node.attribute)) {
 				node.setOutput(getPluralityValue(node));
 				node.setChildren(null);
+				couldPrune = true;
 			}
 		}
 	}
@@ -147,5 +150,9 @@ public class TreeLearner {
 				System.exit(1);
 			}
 		}
+	}
+
+	public boolean couldPrune() {
+		return couldPrune;
 	}
 }

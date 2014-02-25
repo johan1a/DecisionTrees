@@ -8,12 +8,12 @@ public class Main {
 
 		Util.saveToFile("tree", tree.toString());
 		learner.prune(tree);
-		Util.saveToFile("treePruned", tree.toString());
-		learner.prune(tree);
-		Util.saveToFile("treePruned2", tree.toString());
-		/*
-		 * TODO trädet försvinner efter cirka 8 iterationer... ska man ens
-		 * iterera?
-		 */
+		int k = 1;
+		
+		while (learner.couldPrune()) {
+			Util.saveToFile("treePruned" + k, tree.toString());
+			learner.prune(tree);
+			k++;
+		}
 	}
 }
