@@ -112,8 +112,8 @@ public class TreeLearner {
 				}
 			}
 			if (!allChildrenAreLeaves) {
-				for (String s : children.keySet()) {
-					prune(children.get(s));
+				for (Node n : children.values()) {
+					prune(n);
 				}
 			} else if (!entropyMath.relevant(node.attribute)) {
 				node.setOutput(getPluralityValue(allExamples));
